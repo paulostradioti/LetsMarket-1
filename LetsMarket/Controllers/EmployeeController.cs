@@ -1,67 +1,66 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
 using Sharprompt;
-using System.ComponentModel.DataAnnotations;
 
 namespace LetsMarket
 {
     public class EmployeeController
     {
-        public static void CadastrarFuncionarios()
+        public static void RegisterEmployee()
         {
-            var empregado = Prompt.Bind<Employee>();
+            var employee = Prompt.Bind<Employee>();
             var save = Prompt.Confirm("Deseja Salvar?");
             if (!save)
                 return;
 
-            Repository.Funcionarios.Add(empregado);
-            Repository.Save(DatabaseOption.Funcionarios);
+            Repository.Employees.Add(employee);
+            Repository.Save(DatabaseOption.Employees);
         }
 
-        private static string CreateLoginSuggestionBasedOnName(string nome)
+        private static string CreateLoginSuggestionBasedOnName(string name)
         {
-            var parts = nome?.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var parts = name?.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var suggestion = parts?.Length > 0 ? (parts.Length > 1 ? $"{parts[0]}.{parts[parts.Length - 1]}" : $"{parts[0]}") : "";
 
             return suggestion.ToLower();
         }
 
-        public static void ListarFuncionarios()
+        public static void ListEmployees()
         {
             Console.WriteLine("Listando Funcionários");
             Console.WriteLine();
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(Repository.Funcionarios);
+            table.From(Repository.Employees);
             Console.WriteLine(table.ToString());
         }
 
-        public static void EditarFuncionarios()
+        public static void UpdateEmployee()
         {
-            var employee = Prompt.Select("Selecione o Funcionário para Editar", Repository.Funcionarios, defaultValue: Repository.Funcionarios[0]);
+            var employee = Prompt.Select("Selecione o Funcionário para Editar", Repository.Employees, defaultValue: Repository.Employees[0]);
 
             Prompt.Bind(employee);
 
-            Repository.Save(DatabaseOption.Funcionarios);
+            Repository.Save(DatabaseOption.Employees);
         }
 
-        public static void RemoverFuncionarios()
+        public static void RemoveEmployee()
         {
-            if (Repository.Funcionarios.Count == 1)
+            if (Repository.Employees.Count == 1)
             {
                 ConsoleInput.WriteError("Não é possível remover todos os usuários.");
                 Console.ReadKey();
                 return;
             }
 
-            var employee = Prompt.Select("Selecione o Funcionário para Remover", Repository.Funcionarios);
+            var employee = Prompt.Select("Selecione o Funcionário para Remover", Repository.Employees);
             var confirm = Prompt.Confirm("Tem Certeza?", false);
 
             if (!confirm)
                 return;
 
-            Repository.Funcionarios.Remove(employee);
-            Repository.Save(DatabaseOption.Funcionarios);
+            Repository.Employees.Remove(employee);
+            Repository.Save(DatabaseOption.Employees);
         }
     }
 }

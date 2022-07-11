@@ -7,13 +7,13 @@ namespace LetsMarket
     public class CartController
     {
 
-        public static void EfetuarVenda()
+        public static void Sell()
         {
             var total = decimal.Zero;
-            var max = Repository.Produtos.Max(x => x.Description.Length);
-            CartItem.SetTamanho(max);
+            var max = Repository.Products.Max(x => x.Description.Length);
+            CartItem.SetSize(max);
 
-            var itensVenda = new List<CartItem>();
+            var salesItem = new List<CartItem>();
 
 
             /*
@@ -32,10 +32,10 @@ namespace LetsMarket
             }
             */
 
-            var produtos = Repository.Produtos.ToList();
-            var sair = new Product { Codigo = "-1", Description = "Sair", Price = 0 };
-            var fecharVenda = new Product { Codigo = "-1", Description = "Fechar Venda", Price = 0 };
-            var cancelarItem = new Product { Codigo = "-1", Description = "Cancelar Item", Price = 0 };
+            var produtos = Repository.Products.ToList();
+            var sair = new Product { Code = "-1", Description = "Sair", Price = 0 };
+            var fecharVenda = new Product { Code = "-1", Description = "Fechar Venda", Price = 0 };
+            var cancelarItem = new Product { Code = "-1", Description = "Cancelar Item", Price = 0 };
 
             produtos.Add(cancelarItem);
             produtos.Add(fecharVenda);
@@ -48,11 +48,11 @@ namespace LetsMarket
                 Console.WriteLine("EFETUANDO UMA VENDA");
 
                 var relatorio = new Table(TableConfiguration.UnicodeAlt());
-                var maiorColuna = Repository.Produtos.Max(x => x.Description);
+                var maiorColuna = Repository.Products.Max(x => x.Description);
 
-                if (itensVenda.Count > 0)
+                if (salesItem.Count > 0)
                 {
-                    relatorio.From<CartItem>(itensVenda);
+                    relatorio.From<CartItem>(salesItem);
                     Console.WriteLine(relatorio.ToString());
                 }
 
@@ -66,12 +66,12 @@ namespace LetsMarket
                     var quantidade = Prompt.Input<int>("Informe a quantidade", defaultValue: 1);
                     var item = new CartItem
                     {
-                        Codigo = produto.Codigo,
-                        Descricao = produto.Description,
-                        PrecoUnitario = produto.Price,
-                        Quantidade = quantidade
+                        Code = produto.Code,
+                        Description = produto.Description,
+                        UnitPrice = produto.Price,
+                        Quantity = quantidade
                     };
-                    itensVenda.Add(item);
+                    salesItem.Add(item);
                     total += item.Subtotal;
                 }
 
@@ -79,10 +79,10 @@ namespace LetsMarket
                 {
                     Console.Clear();
                     Console.WriteLine("Selecione o item a ser cancelado");
-                    var item = Prompt.Select("Selecione o item a ser cancelado", itensVenda);
-                    itensVenda.Remove(item);
+                    var item = Prompt.Select("Selecione o item a ser cancelado", salesItem);
+                    salesItem.Remove(item);
 
-                    total -= item.PrecoUnitario;
+                    total -= item.UnitPrice;
                 }
             } while (produto != sair && produto != fecharVenda);
 

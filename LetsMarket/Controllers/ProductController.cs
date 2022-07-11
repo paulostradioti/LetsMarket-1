@@ -6,45 +6,45 @@ namespace LetsMarket
 {
     public class ProductController
     {
-        public static void CadastrarProdutos()
+        public static void RegisterProduct()
         {
             var product = Prompt.Bind<Product>();
 
             if (!Prompt.Confirm("Deseja Salvar?"))
                 return;
 
-            Repository.Produtos.Add(product);
+            Repository.Products.Add(product);
             Repository.Save(DatabaseOption.Products);
         }
 
-        public static void ListarProdutos()
+        public static void ListProducts()
         {
             Console.WriteLine("Listando Produtos");
             Console.WriteLine();
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(Repository.Produtos);
+            table.From(Repository.Products);
             Console.WriteLine(table.ToString());
         }
 
-        public static void EditarProduto()
+        public static void UpdateProduct()
         {
-            var produto = Prompt.Select("Selecione o Produto para Editar", Repository.Produtos, defaultValue: Repository.Produtos[0]);
+            var product = Prompt.Select("Selecione o Produto para Editar", Repository.Products, defaultValue: Repository.Products[0]);
 
-            Prompt.Bind(produto);
+            Prompt.Bind(product);
 
             Repository.Save(DatabaseOption.Products);
         }
 
-        public static void RemoverProduto()
+        public static void RemoveProduct()
         {
-            var produto = Prompt.Select("Selecione o Produto para Remover", Repository.Produtos);
+            var product = Prompt.Select("Selecione o Produto para Remover", Repository.Products);
             var confirm = Prompt.Confirm("Tem Certeza?", false);
 
             if (!confirm)
                 return;
 
-            Repository.Produtos.Remove(produto);
+            Repository.Products.Remove(product);
             Repository.Save(DatabaseOption.Products);
         }
     }

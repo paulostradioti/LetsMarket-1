@@ -6,7 +6,7 @@ namespace LetsMarket.Models
     {
         [Display(Name = "Código")]
         [Required(ErrorMessage = "O código é obrigatório")]
-        public string Codigo { get; set; }
+        public string Code { get; set; }
 
         [Display(Name = "Descrição")]
         [Required(ErrorMessage = "A descrição é obrigatória")]
