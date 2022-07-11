@@ -6,44 +6,44 @@ namespace LetsMarket
     {     
         static void Main()
         {
-            ConfiguraPrompt();
+            ConfigurePrompt();
             Console.Title = "Let's Store";
 
-            VerificaLogin();
+            VerifyLogin();
 
             var menu = new MenuItem("Menu Principal");
 
-            var produtos = new MenuItem("Produtos");
-            produtos.Add(new MenuItem("Cadastrar Produtos", Produto.CadastrarProdutos));
-            produtos.Add(new MenuItem("Listar Produtos", Produto.ListarProdutos));
-            produtos.Add(new MenuItem("Editar Produtos", Produto.EditarProduto));
-            produtos.Add(new MenuItem("Remover Produtos", Produto.RemoverProduto));
+            var products = new MenuItem("Produtos");
+            products.Add(new MenuItem("Cadastrar Produtos", ProductController.RegisterProduct));
+            products.Add(new MenuItem("Listar Produtos", ProductController.ListProducts));
+            products.Add(new MenuItem("Editar Produtos", ProductController.UpdateProduct));
+            products.Add(new MenuItem("Remover Produtos", ProductController.RemoveProduct));
 
-            var funcionarios = new MenuItem("Funcionários");
-            funcionarios.Add(new MenuItem("Cadastrar Funcionários", Funcionario.CadastrarFuncionarios));
-            funcionarios.Add(new MenuItem("Listar Funcionários", Funcionario.ListarFuncionarios));
-            funcionarios.Add(new MenuItem("Editar Funcionários", Funcionario.EditarFuncionarios));
-            funcionarios.Add(new MenuItem("Remover Funcionários", Funcionario.RemoverFuncionarios));
+            var employees = new MenuItem("Funcionários");
+            employees.Add(new MenuItem("Cadastrar Funcionários", EmployeeController.RegisterEmployee));
+            employees.Add(new MenuItem("Listar Funcionários", EmployeeController.ListEmployees));
+            employees.Add(new MenuItem("Editar Funcionários", EmployeeController.UpdateEmployee));
+            employees.Add(new MenuItem("Remover Funcionários", EmployeeController.RemoveEmployee));
 
-            var clientes = new MenuItem("Clientes");
-            clientes.Add(new MenuItem("Cadastrar Clientes", Cliente.CadastrarClientes));
-            clientes.Add(new MenuItem("Listar Clientes", Cliente.ListarClientes));
-            clientes.Add(new MenuItem("Editar Clientes", Cliente.EditarClientes));
-            clientes.Add(new MenuItem("Remover Clientes", Cliente.RemoverClientes));
+            var customers = new MenuItem("Clientes");
+            customers.Add(new MenuItem("Cadastrar Clientes", CustomerController.RegisterCustomer));
+            customers.Add(new MenuItem("Listar Clientes", CustomerController.ListCustomers));
+            customers.Add(new MenuItem("Editar Clientes", CustomerController.UpdateCustomer));
+            customers.Add(new MenuItem("Remover Clientes", CustomerController.RemoveCustomer));
 
             var vendas = new MenuItem("Vendas");
-            vendas.Add(new MenuItem("Efetuar Venda", Vendas.EfetuarVenda));
+            vendas.Add(new MenuItem("Efetuar Venda", CartController.Sell));
 
-            menu.Add(produtos);
-            menu.Add(funcionarios);
-            menu.Add(clientes);
+            menu.Add(products);
+            menu.Add(employees);
+            menu.Add(customers);
             menu.Add(vendas);
             menu.Add(new MenuItem("Sair", () => Environment.Exit(0)));
 
             menu.Execute();
         }
 
-        private static void ConfiguraPrompt()
+        private static void ConfigurePrompt()
         {
             Prompt.ColorSchema.Answer = ConsoleColor.White;
             Prompt.ColorSchema.Select = ConsoleColor.White;
@@ -53,7 +53,7 @@ namespace LetsMarket
             Prompt.Symbols.Error = new Symbol("", "");
         }
 
-        private static void VerificaLogin()
+        private static void ValidateLogin()
         {
             var loggedIn = false;
             var attempts = 0;
@@ -75,18 +75,18 @@ namespace LetsMarket
                 var username = ConsoleInput.GetString("login");
                 var password = ConsoleInput.GetPassword("senha");
 
-                if (LoginIsValid(username, password))
+                if (IsLoginValid(username, password))
                     loggedIn = true;
 
             } while (!loggedIn);
 
         }
 
-        private static bool LoginIsValid(string? username, string password)
+        private static bool IsLoginValid(string? username, string password)
         {
-            foreach (var usuario in Database.Funcionarios)
+            foreach (var user in Repository.Employees)
             {
-                if (usuario.Login == username && usuario.Password == password)
+                if (user.Login == username && user.Password == password)
                     return true;
             }
 

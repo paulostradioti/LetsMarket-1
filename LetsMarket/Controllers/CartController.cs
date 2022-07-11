@@ -1,41 +1,19 @@
 ﻿using BetterConsoleTables;
+using LetsMarket.Models;
 using Sharprompt;
 
 namespace LetsMarket
 {
-    public class Vendas
+    public class CartController
     {
-        public class ItemVenda
-        {
-            private static int _maiorColuna;
-            private string _descricao;
-            public static void SetTamanho(int tamanho) => _maiorColuna = tamanho;
-            public string Codigo { get; set; }
-            public string Descricao
-            {
-                get => _descricao;
-                set
-                {
-                    _descricao = value.PadRight(_maiorColuna + 5);
-                }
-            }
-            public int Quantidade { get; set; }
-            public decimal PrecoUnitario { get; set; }
-            public decimal Subtotal { get => Quantidade * PrecoUnitario; }
 
-            public override string ToString()
-            {
-                return Descricao;
-            }
-        }
-
-        public static void EfetuarVenda()
+        public static void Sell()
         {
             var total = decimal.Zero;
-            var max = Database.Produtos.Max(x => x.Description.Length);
-            ItemVenda.SetTamanho(max);
+            var max = Repository.Products.Max(x => x.Description.Length);
+            CartItem.SetSize(max);
 
-            var itensVenda = new List<ItemVenda>();
+            var salesItem = new List<CartItem>();
 
 
             /*
@@ -54,27 +32,27 @@ namespace LetsMarket
             }
             */
 
-            var produtos = Database.Produtos.ToList();
-            var sair = new Produto { Codigo = "-1", Description = "Sair", Price = 0 };
-            var fecharVenda = new Produto { Codigo = "-1", Description = "Fechar Venda", Price = 0 };
-            var cancelarItem = new Produto { Codigo = "-1", Description = "Cancelar Item", Price = 0 };
+            var produtos = Repository.Products.ToList();
+            var sair = new Product { Code = "-1", Description = "Sair", Price = 0 };
+            var fecharVenda = new Product { Code = "-1", Description = "Fechar Venda", Price = 0 };
+            var cancelarItem = new Product { Code = "-1", Description = "Cancelar Item", Price = 0 };
 
             produtos.Add(cancelarItem);
             produtos.Add(fecharVenda);
             produtos.Add(sair);
 
-            Produto produto = null;
+            Product produto = null;
             do
             {
                 Console.Clear();
                 Console.WriteLine("EFETUANDO UMA VENDA");
 
                 var relatorio = new Table(TableConfiguration.UnicodeAlt());
-                var maiorColuna = Database.Produtos.Max(x => x.Description);
+                var maiorColuna = Repository.Products.Max(x => x.Description);
 
-                if (itensVenda.Count > 0)
+                if (salesItem.Count > 0)
                 {
-                    relatorio.From<ItemVenda>(itensVenda);
+                    relatorio.From<CartItem>(salesItem);
                     Console.WriteLine(relatorio.ToString());
                 }
 
@@ -86,14 +64,14 @@ namespace LetsMarket
                 if (produto != sair && produto != fecharVenda && produto != cancelarItem)
                 {
                     var quantidade = Prompt.Input<int>("Informe a quantidade", defaultValue: 1);
-                    var item = new ItemVenda
+                    var item = new CartItem
                     {
-                        Codigo = produto.Codigo,
-                        Descricao = produto.Description,
-                        PrecoUnitario = produto.Price,
-                        Quantidade = quantidade
+                        Code = produto.Code,
+                        Description = produto.Description,
+                        UnitPrice = produto.Price,
+                        Quantity = quantidade
                     };
-                    itensVenda.Add(item);
+                    salesItem.Add(item);
                     total += item.Subtotal;
                 }
 
@@ -101,10 +79,10 @@ namespace LetsMarket
                 {
                     Console.Clear();
                     Console.WriteLine("Selecione o item a ser cancelado");
-                    var item = Prompt.Select("Selecione o item a ser cancelado", itensVenda);
-                    itensVenda.Remove(item);
+                    var item = Prompt.Select("Selecione o item a ser cancelado", salesItem);
+                    salesItem.Remove(item);
 
-                    total -= item.PrecoUnitario;
+                    total -= item.UnitPrice;
                 }
             } while (produto != sair && produto != fecharVenda);
 
