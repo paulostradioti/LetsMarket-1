@@ -7,25 +7,25 @@ using System.Threading.Tasks;
 
 namespace LetsMarket.Models
 {
-    public class Client
+    public class Customer
     {
         [Display(Name = "Nome")]
         [Required]
-        public string Nome { get; set; }
+        public string Name { get; set; }
 
         [Display(Name = "Documento")]
         [Required(ErrorMessage = "O Documento é Obrigatório")]
         [MinLength(11)]
         [MaxLength(11)]
-        public string Documento { get; set; }
+        public string Document { get; set; }
 
 
         [Display(Name = "Categoria")]
-        public ClientCategory? Category { get; set; }
+        public CustomerCategory? Category { get; set; }
 
         public override string ToString()
         {
-            return $"{Nome} - {Documento}";
+            return $"{Name} - {Document}";
         }
     }
 }

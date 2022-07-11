@@ -8,25 +8,26 @@ namespace LetsMarket.Models
 {
     internal class CartItem
     {
-        private static int _maiorColuna;
-        private string _descricao;
-        public static void SetTamanho(int tamanho) => _maiorColuna = tamanho;
-        public string Codigo { get; set; }
-        public string Descricao
+        private static int _longestWord;
+        private string _description;
+
+        public static void SetSize(int size) => _longestWord = size;
+        public string Code { get; set; }
+        public string Description
         {
-            get => _descricao;
+            get => _description;
             set
             {
-                _descricao = value.PadRight(_maiorColuna + 5);
+                _description = value.PadRight(_longestWord + 5);
             }
         }
-        public int Quantidade { get; set; }
-        public decimal PrecoUnitario { get; set; }
-        public decimal Subtotal { get => Quantidade * PrecoUnitario; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal Subtotal { get => Quantity * UnitPrice; }
 
         public override string ToString()
         {
-            return Descricao;
+            return Description;
         }
     }
 }
