@@ -7,6 +7,15 @@ namespace LetsMarket
     {     
         static void Main()
         {
+            //var employeeRepository = new EmployeeRepository();
+
+            //var list = employeeRepository.GetAll();
+
+            //var excluir = list.Find(l => l.Login == "ana");
+            //list[0].Login = "teste";
+            //employeeRepository.Remove(excluir);
+
+
             DatabaseInitializer.Initialize();
             ConfigurePrompt();
             Console.Title = "Let's Store";

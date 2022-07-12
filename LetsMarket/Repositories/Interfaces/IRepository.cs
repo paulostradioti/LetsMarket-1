@@ -1,7 +1,9 @@
-﻿namespace LetsMarket.Repositories.Interfaces
+﻿using LetsMarket.Models;
+
+namespace LetsMarket.Repositories.Interfaces
 {
     public interface IRepository<T>
-        where T: class
+        where T: Entity
     {
         void Add(T model);
         void Update(T model);

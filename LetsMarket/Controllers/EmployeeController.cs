@@ -10,8 +10,8 @@ namespace LetsMarket
         public static void RegisterEmployee()
         {
             var employeeRepository = new Repositories.EmployeeRepository();
-            
-            var employee = Prompt.Bind<Employee>();
+            var employee = new Employee();
+            employee = Prompt.Bind<Employee>();
             var save = Prompt.Confirm("Deseja Salvar?");
             if (!save)
                 return;
@@ -42,7 +42,7 @@ namespace LetsMarket
         {
             var employeeRepository = new EmployeeRepository();
             var employees = employeeRepository.GetAll();
-            
+
             var employee = Prompt.Select("Selecione o Funcionário para Editar", employees, defaultValue: employees[0]);
 
             Prompt.Bind(employee);
@@ -55,7 +55,7 @@ namespace LetsMarket
             var employeeRepository = new EmployeeRepository();
 
             var employees = employeeRepository.GetAll();
-            
+
             if (employees.Count == 1)
             {
                 ConsoleInput.WriteError("Não é possível remover todos os usuários.");

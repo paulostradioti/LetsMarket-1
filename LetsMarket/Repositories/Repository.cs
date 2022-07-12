@@ -1,68 +1,105 @@
-﻿using LetsMarket.Repositories.Interfaces;
+﻿using LetsMarket.Models;
+using LetsMarket.Repositories.Interfaces;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
 namespace LetsMarket.Repositories
 {
     public abstract class Repository<T> : IRepository<T>
-        where T : class
+        where T : Entity
     {
 
         private readonly string _fileName;
         private List<T> _items;
+        private long _count = 0;
 
         protected Repository()
         {
-            _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml"); // define o nome do arquivo xml baseado no nome do tipo genérico do repositorio
+            _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml");
             Load();
         }
 
         private void Load()
         {
-            if (File.Exists(_fileName)) // se o arquivo existir
+            if (File.Exists(_fileName))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
-                using (TextReader reader = new StreamReader(_fileName)) // cria um leitor que será destruido no fim do using
+                using (TextReader reader = new StreamReader(_fileName))
                 {
-                    var items = serializer.Deserialize(reader) as List<T>; // converte o arquivo XML em uma lista do tipo
-                    _items = items ?? new List<T>(); // se items estiver nulo retorna uma instância da lista vazia
+                    var items = serializer.Deserialize(reader) as List<T>;
+                    foreach (var item in items)
+                    {
+                        _count++;
+                        item.SetId(_count);
+                    }
+
+                    _items = items ?? new List<T>();
                 }
             }
-            else // se o arquivo não existir
+            else
             {
-                _items = new List<T>(); // intancia a lista vazia
+                _items = new List<T>();
             }
         }
 
         private void Save()
         {
             Console.WriteLine("Salvando...");
-            XmlSerializer serializer = new XmlSerializer(typeof(List<T>)); // cria o serializador
-            using (TextWriter writer = new StreamWriter(_fileName)) // cria o escritor de arquivo
+            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+            using (TextWriter writer = new StreamWriter(_fileName))
             {
-                serializer.Serialize(writer, _items); // escreve a Lista no arquivo xml
+                serializer.Serialize(writer, _items);
             }
             Console.WriteLine("Salvo.");
         }
 
+        public T DeepClone(T obj)
+        {
+            T objResult;
+
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, obj);
+
+                ms.Position = 0;
+                objResult = (T)bf.Deserialize(ms);
+            }
+            return objResult;
+        }
+
         public void Add(T model)
         {
+            _count++;
+            model.SetId(_count);
             _items.Add(model);
             Save();
         }
 
         public void Remove(T model)
         {
-            _items.Remove(model);
+            var item = _items.Find(i => i.GetId() == model.GetId());
+            _items.Remove(item);
             Save();
         }
 
         public List<T> GetAll()
         {
-            return _items;
+            var ret = new List<T>();
+            foreach (var item in _items)
+            {
+                ret.Add(DeepClone(item));
+            }
+            return ret;
         }
 
         public void Update(T model)
         {
+            var item = _items.FirstOrDefault(i => i.GetId() == model.GetId());
+            var itemIndex = _items.IndexOf(item);
+            _items.RemoveAt(itemIndex);
+            _items.Insert(itemIndex, model);
+
             Save();
         }
     }
