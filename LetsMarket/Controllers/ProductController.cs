@@ -1,51 +1,58 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
+using LetsMarket.Repositories;
 using Sharprompt;
 
 namespace LetsMarket
 {
     public class ProductController
     {
+
+
         public static void RegisterProduct()
         {
+            var productRepository = new ProductRepository();
+            
             var product = Prompt.Bind<Product>();
 
             if (!Prompt.Confirm("Deseja Salvar?"))
                 return;
 
-            Repository.Products.Add(product);
-            Repository.Save(DatabaseOption.Products);
+            productRepository.Add(product);
         }
 
         public static void ListProducts()
         {
+            var productRepository = new ProductRepository();
+            
             Console.WriteLine("Listando Produtos");
             Console.WriteLine();
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(Repository.Products);
+            table.From(productRepository.GetAll());
             Console.WriteLine(table.ToString());
         }
 
         public static void UpdateProduct()
         {
-            var product = Prompt.Select("Selecione o Produto para Editar", Repository.Products, defaultValue: Repository.Products[0]);
+            var productRepository =new ProductRepository();
+            var products = productRepository.GetAll();
+            var product = Prompt.Select("Selecione o Produto para Editar", products, defaultValue: products[0]);
 
             Prompt.Bind(product);
-
-            Repository.Save(DatabaseOption.Products);
+            productRepository.Update(product);
         }
 
         public static void RemoveProduct()
         {
-            var product = Prompt.Select("Selecione o Produto para Remover", Repository.Products);
+            var productRepository = new ProductRepository();
+            var product = Prompt.Select("Selecione o Produto para Remover", productRepository.GetAll());
             var confirm = Prompt.Confirm("Tem Certeza?", false);
 
             if (!confirm)
                 return;
 
-            Repository.Products.Remove(product);
-            Repository.Save(DatabaseOption.Products);
+            productRepository.Remove(product);
         }
     }
 }

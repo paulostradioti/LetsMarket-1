@@ -1,129 +1,69 @@
-﻿using CsvHelper;
-using LetsMarket.Models;
-using System.Globalization;
+﻿using LetsMarket.Repositories.Interfaces;
 using System.Xml.Serialization;
 
-namespace LetsMarket
+namespace LetsMarket.Repositories
 {
-    public enum DatabaseOption { Employees, Products, Customers }
-
-    public class Repository
+    public abstract class Repository<T> : IRepository<T>
+        where T : class
     {
-        private static readonly string _rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string _employeesDb = Path.Combine(_rootDirectory, "employees.xml");
-        private static readonly string _productsDb = Path.Combine(_rootDirectory, "products.xml");
-        private static readonly string _clientsDb = Path.Combine(_rootDirectory, "customers.xml");
 
-        public static List<Employee> Employees = new List<Employee>();
-        public static List<Product> Products = new List<Product>();
-        public static List<Customer> Customers = new List<Customer>();
+        private readonly string _fileName;
+        private List<T> _items;
 
-        static Repository()
+        protected Repository()
         {
-            InitializeDatabase();
+            _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml"); // define o nome do arquivo xml baseado no nome do tipo genérico do repositorio
+            Load();
         }
 
-        public static void InitializeDatabase()
+        private void Load()
         {
-            if (!File.Exists(_employeesDb))
+            if (File.Exists(_fileName)) // se o arquivo existir
             {
-                Employees.Add(new Employee { Name = "Admin", Login = "admin", Password = "admin" });
-                Save(DatabaseOption.Employees);
-            }
-
-            if (!File.Exists(_productsDb) && File.Exists("Database/data.csv"))
-            {
-                var faker = new Bogus.DataSets.Commerce();
-
-                using (var reader = new StreamReader("Database/data.csv"))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+                using (TextReader reader = new StreamReader(_fileName)) // cria um leitor que será destruido no fim do using
                 {
-                    csv.Context.RegisterClassMap<CsvReaderClassMap>();
-                    var products = csv.GetRecords<Product>().ToList();
-                    Products = products.OrderBy(x => Guid.NewGuid()).Take(10).ToList();
-                    products.ForEach(x => x.Price = decimal.Parse(faker.Price()));
-
-                    Save(DatabaseOption.Products);
+                    var items = serializer.Deserialize(reader) as List<T>; // converte o arquivo XML em uma lista do tipo
+                    _items = items ?? new List<T>(); // se items estiver nulo retorna uma instância da lista vazia
                 }
             }
-
-            if (!File.Exists(_clientsDb))
+            else // se o arquivo não existir
             {
-                for (int i = 0; i < 10; i++)
-                    Customers.Add(CustomerFaker.Generate());
-                
-                Save(DatabaseOption.Customers);
-            }
-
-            Load(DatabaseOption.Employees);
-            Load(DatabaseOption.Products);
-            Load(DatabaseOption.Customers);
-        }
-
-        private static void Load(DatabaseOption options)
-        {
-            if (options == DatabaseOption.Employees)
-            {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Employee>));
-                using (TextReader reader = new StreamReader(_employeesDb))
-                {
-                    var employees = employeeSerializer.Deserialize(reader) as List<Employee>;
-                    Employees = employees ?? new List<Employee>();
-                }
-            }
-
-            if (options == DatabaseOption.Products)
-            {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Product>));
-                using (TextReader reader = new StreamReader(_productsDb))
-                {
-                    var funcionarios = employeeSerializer.Deserialize(reader) as List<Product>;
-                    Products = funcionarios ?? new List<Product>();
-                }
-            }
-
-            if (options == DatabaseOption.Customers)
-            {
-                XmlSerializer clientSerializer = new XmlSerializer(typeof(List<Customer>));
-                using (TextReader reader = new StreamReader(_clientsDb))
-                {
-                    var funcionarios = clientSerializer.Deserialize(reader) as List<Customer>;
-                    Customers = funcionarios ?? new List<Customer>();
-                }
+                _items = new List<T>(); // intancia a lista vazia
             }
         }
 
-        public static void Save(DatabaseOption options)
+        private void Save()
         {
             Console.WriteLine("Salvando...");
-
-            if (options == DatabaseOption.Employees)
+            XmlSerializer serializer = new XmlSerializer(typeof(List<T>)); // cria o serializador
+            using (TextWriter writer = new StreamWriter(_fileName)) // cria o escritor de arquivo
             {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Employee>));
-                using (TextWriter writer = new StreamWriter(_employeesDb))
-                {
-                    employeeSerializer.Serialize(writer, Employees);
-                }
-            }
-
-            if (options == DatabaseOption.Products)
-            {
-                XmlSerializer productSerializer = new XmlSerializer(typeof(List<Product>));
-                using (TextWriter writer = new StreamWriter(_productsDb))
-                {
-                    productSerializer.Serialize(writer, Products);
-                }
-            }
-
-            if (options == DatabaseOption.Customers)
-            {
-                XmlSerializer clientSerializer = new XmlSerializer(typeof(List<Customer>));
-                using (TextWriter writer = new StreamWriter(_clientsDb))
-                {
-                    clientSerializer.Serialize(writer, Customers);
-                }
+                serializer.Serialize(writer, _items); // escreve a Lista no arquivo xml
             }
             Console.WriteLine("Salvo.");
+        }
+
+        public void Add(T model)
+        {
+            _items.Add(model);
+            Save();
+        }
+
+        public void Remove(T model)
+        {
+            _items.Remove(model);
+            Save();
+        }
+
+        public List<T> GetAll()
+        {
+            return _items;
+        }
+
+        public void Update(T model)
+        {
+            Save();
         }
     }
 }

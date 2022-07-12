@@ -1,5 +1,6 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
+using LetsMarket.Repositories;
 using Sharprompt;
 
 namespace LetsMarket
@@ -8,13 +9,14 @@ namespace LetsMarket
     {
         public static void RegisterEmployee()
         {
+            var employeeRepository = new Repositories.EmployeeRepository();
+            
             var employee = Prompt.Bind<Employee>();
             var save = Prompt.Confirm("Deseja Salvar?");
             if (!save)
                 return;
 
-            Repository.Employees.Add(employee);
-            Repository.Save(DatabaseOption.Employees);
+            employeeRepository.Add(employee);
         }
 
         private static string CreateLoginSuggestionBasedOnName(string name)
@@ -27,40 +29,47 @@ namespace LetsMarket
 
         public static void ListEmployees()
         {
+            var employeeRepository = new EmployeeRepository();
             Console.WriteLine("Listando Funcionários");
             Console.WriteLine();
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(Repository.Employees);
+            table.From(employeeRepository.GetAll());
             Console.WriteLine(table.ToString());
         }
 
         public static void UpdateEmployee()
         {
-            var employee = Prompt.Select("Selecione o Funcionário para Editar", Repository.Employees, defaultValue: Repository.Employees[0]);
+            var employeeRepository = new EmployeeRepository();
+            var employees = employeeRepository.GetAll();
+            
+            var employee = Prompt.Select("Selecione o Funcionário para Editar", employees, defaultValue: employees[0]);
 
             Prompt.Bind(employee);
 
-            Repository.Save(DatabaseOption.Employees);
+            employeeRepository.Update(employee);
         }
 
         public static void RemoveEmployee()
         {
-            if (Repository.Employees.Count == 1)
+            var employeeRepository = new EmployeeRepository();
+
+            var employees = employeeRepository.GetAll();
+            
+            if (employees.Count == 1)
             {
                 ConsoleInput.WriteError("Não é possível remover todos os usuários.");
                 Console.ReadKey();
                 return;
             }
 
-            var employee = Prompt.Select("Selecione o Funcionário para Remover", Repository.Employees);
+            var employee = Prompt.Select("Selecione o Funcionário para Remover", employees);
             var confirm = Prompt.Confirm("Tem Certeza?", false);
 
             if (!confirm)
                 return;
 
-            Repository.Employees.Remove(employee);
-            Repository.Save(DatabaseOption.Employees);
+            employeeRepository.Remove(employee);
         }
     }
 }

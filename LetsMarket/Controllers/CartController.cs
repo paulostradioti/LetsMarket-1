@@ -1,5 +1,6 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
+using LetsMarket.Repositories;
 using Sharprompt;
 
 namespace LetsMarket
@@ -9,8 +10,11 @@ namespace LetsMarket
 
         public static void Sell()
         {
+            var productRepository = new ProductRepository();
+            var products = productRepository.GetAll();
+
             var total = decimal.Zero;
-            var max = Repository.Products.Max(x => x.Description.Length);
+            var max = products.Max(x => x.Description.Length);
             CartItem.SetSize(max);
 
             var salesItem = new List<CartItem>();
@@ -32,14 +36,13 @@ namespace LetsMarket
             }
             */
 
-            var produtos = Repository.Products.ToList();
             var sair = new Product { Code = "-1", Description = "Sair", Price = 0 };
             var fecharVenda = new Product { Code = "-1", Description = "Fechar Venda", Price = 0 };
             var cancelarItem = new Product { Code = "-1", Description = "Cancelar Item", Price = 0 };
 
-            produtos.Add(cancelarItem);
-            produtos.Add(fecharVenda);
-            produtos.Add(sair);
+            products.Add(cancelarItem);
+            products.Add(fecharVenda);
+            products.Add(sair);
 
             Product produto = null;
             do
@@ -48,7 +51,7 @@ namespace LetsMarket
                 Console.WriteLine("EFETUANDO UMA VENDA");
 
                 var relatorio = new Table(TableConfiguration.UnicodeAlt());
-                var maiorColuna = Repository.Products.Max(x => x.Description);
+                var maiorColuna = products.Max(x => x.Description);
 
                 if (salesItem.Count > 0)
                 {
@@ -60,7 +63,7 @@ namespace LetsMarket
                 Console.WriteLine();
 
                 // Early Return
-                produto = Prompt.Select("Selecione o produto", produtos);
+                produto = Prompt.Select("Selecione o produto", products);
                 if (produto != sair && produto != fecharVenda && produto != cancelarItem)
                 {
                     var quantidade = Prompt.Input<int>("Informe a quantidade", defaultValue: 1);
@@ -95,9 +98,9 @@ namespace LetsMarket
                 Console.ReadKey();
             }
 
-            produtos.Remove(sair);
-            produtos.Remove(fecharVenda);
-            produtos.Remove(cancelarItem);
+            products.Remove(sair);
+            products.Remove(fecharVenda);
+            products.Remove(cancelarItem);
 
             return;
         }
