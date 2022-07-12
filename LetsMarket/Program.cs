@@ -1,4 +1,6 @@
-﻿using LetsMarket.Repositories;
+﻿using LetsMarket.Controllers.Interfaces;
+using LetsMarket.Repositories;
+using LetsMarket.Views;
 using Sharprompt;
 
 namespace LetsMarket
@@ -30,11 +32,12 @@ namespace LetsMarket
             products.Add(new MenuItem("Editar Produtos", ProductController.UpdateProduct));
             products.Add(new MenuItem("Remover Produtos", ProductController.RemoveProduct));
 
+            IEmployeeController employeeController = new EmployeeController(new EmployeeView(), new EmployeeRepository());
             var employees = new MenuItem("Funcionários");
-            employees.Add(new MenuItem("Cadastrar Funcionários", EmployeeController.RegisterEmployee));
-            employees.Add(new MenuItem("Listar Funcionários", EmployeeController.ListEmployees));
-            employees.Add(new MenuItem("Editar Funcionários", EmployeeController.UpdateEmployee));
-            employees.Add(new MenuItem("Remover Funcionários", EmployeeController.RemoveEmployee));
+            employees.Add(new MenuItem("Cadastrar Funcionários", employeeController.RegisterEmployee));
+            employees.Add(new MenuItem("Listar Funcionários", employeeController.ListEmployees));
+            employees.Add(new MenuItem("Editar Funcionários", employeeController.UpdateEmployee));
+            employees.Add(new MenuItem("Remover Funcionários", employeeController.RemoveEmployee));
 
             var customers = new MenuItem("Clientes");
             customers.Add(new MenuItem("Cadastrar Clientes", CustomerController.RegisterCustomer));
