@@ -9,7 +9,7 @@ namespace LetsMarket
             ConfigurePrompt();
             Console.Title = "Let's Store";
 
-            VerifyLogin();
+            ValidateLogin();
 
             var menu = new MenuItem("Menu Principal");
 
