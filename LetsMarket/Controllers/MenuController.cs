@@ -1,15 +1,23 @@
 ﻿using LetsMarket.Controllers.ControllersInterface;
 using LetsMarket.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LetsMarket.Views.ViewInterface;
 
 namespace LetsMarket.Controllers
 {
     internal class MenuController : IMenuController
     {
+        public static List<ConsoleKey> acceptedKeys = new List<ConsoleKey>() 
+        { 
+            ConsoleKey.PageUp,
+            ConsoleKey.UpArrow,
+            ConsoleKey.PageDown,
+            ConsoleKey.DownArrow,
+            ConsoleKey.Enter,
+            ConsoleKey.RightArrow,
+            ConsoleKey.Escape,
+            ConsoleKey.LeftArrow,
+            ConsoleKey.Backspace
+        };
         public Menu CreateMenu()
         {
             var menu = new Menu("Menu Principal");
@@ -44,9 +52,55 @@ namespace LetsMarket.Controllers
             return menu;
         }
 
-        public void RunMenu(Menu menu)
+        public void RunMenu(Menu menu, IMenuView menuView)
         {
-            throw new NotImplementedException();
+            if (menu.Type == MenuType.Submenu)
+            {
+                if (menu.items.Count == 0) return;
+
+                var key = menuView.ShowMenu(menu);
+                HandleKey(key, menu, menuView);
+
+            }
+            else if (menu.Type == MenuType.Command)
+            {
+                menu.action();
+                Console.ReadKey(true);
+            }
+        }
+
+        public void HandleKey(ConsoleKey key, Menu menu, IMenuView menuView)
+        {
+            switch (key)
+            {
+                case ConsoleKey.PageUp:
+                case ConsoleKey.UpArrow:
+                    menu.selectedIndex = Math.Max(menu.selectedIndex - 1, 0);
+                    RunMenu(menu, menuView);
+                    break;
+                case ConsoleKey.PageDown:
+                case ConsoleKey.DownArrow:
+                    menu.selectedIndex = Math.Min(menu.selectedIndex + 1, Math.Max(menu.items.Count - 1, 0));
+                    RunMenu(menu, menuView);
+                    break;
+                case ConsoleKey.Enter:
+                case ConsoleKey.RightArrow:
+                    RunMenu(menu.items[menu.selectedIndex], menuView);
+                    break;
+                case ConsoleKey.Escape:
+                    if (menu == Menu._root)
+                        return;
+                    RunMenu(menu.parent, menuView);
+                    break;
+                case ConsoleKey.LeftArrow:
+                case ConsoleKey.Backspace:
+                    if (menu == Menu._root)
+                        return;
+                    RunMenu(menu.parent, menuView);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

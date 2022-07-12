@@ -3,18 +3,18 @@
 
     public class Menu
     {
-        private const string UNSELECTED = "|     ";
-        private const string SELECTED = "|   » ";
-        private readonly int LINE_WIDTH = Console.WindowWidth / 3;//50;
+        public readonly string UNSELECTED = "|     ";
+        public readonly string SELECTED = "|   » ";
+        public readonly int LINE_WIDTH = Console.WindowWidth / 3;//50;
 
         public MenuType Type { get; }
-        private static Menu _root;
-        private Menu parent = null;
-        private string title;
-        private List<Menu> items;
-        private Action action;
+        public static Menu _root;
+        public Menu parent = null;
+        public string title;
+        public List<Menu> items;
+        public Action action;
 
-        private int selectedIndex = 0;
+        public int selectedIndex = 0;
         public Menu(string title)
         {
             this.title = title;
@@ -34,99 +34,6 @@
             menuItem.parent = this;
             items.Add(menuItem);
         }
-
-        public void Execute()
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.Clear();
-            Console.ResetColor();
-
-            switch (Type)
-            {
-                case MenuType.Submenu:
-                    if (items.Count == 0)
-                        return;
-                    RenderSubmenu();
-                    break;
-
-                case MenuType.Command:
-                    action();
-                    Console.ReadKey(true);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return;
-
-            void RenderSubmenu()
-            {
-                var key = new ConsoleKeyInfo();
-                do
-                {
-                    Console.ResetColor();
-                    Console.Clear();
-
-                    var menuTitle = $"{UNSELECTED}{title.ToUpperInvariant().PadRight(LINE_WIDTH)}|";
-                    var lineSeparator = $"|{new string('-', menuTitle.Length - 2)}|";
-
-                    Console.WriteLine(lineSeparator);
-                    Console.WriteLine(menuTitle);
-                    Console.WriteLine(lineSeparator);
-
-                    for (int i = 0; i < items.Count; i++)
-                    {
-                        var isSelected = i == selectedIndex;
-                        var margin = isSelected ? SELECTED : UNSELECTED;
-
-                        if (isSelected)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Black;
-                            Console.BackgroundColor = ConsoleColor.White;
-                        }
-                        else
-                        {
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.BackgroundColor = ConsoleColor.Black;
-                        }
-                        Console.WriteLine($"{margin}{items[i].ToString().PadRight(LINE_WIDTH)}|");
-                        Console.ResetColor();
-                    }
-                    Console.WriteLine(lineSeparator);
-
-                    key = Console.ReadKey(true);
-                    switch (key.Key)
-                    {
-                        case ConsoleKey.PageUp:
-                        case ConsoleKey.UpArrow:
-                            selectedIndex = Math.Max(selectedIndex - 1, 0);
-                            break;
-                        case ConsoleKey.PageDown:
-                        case ConsoleKey.DownArrow:
-                            selectedIndex = Math.Min(selectedIndex + 1, Math.Max(items.Count - 1, 0));
-                            break;
-                        case ConsoleKey.Enter:
-                        case ConsoleKey.RightArrow:
-                            items[selectedIndex].Execute();
-                            break;
-                        case ConsoleKey.Escape:
-                            if (this != _root)
-                                return;
-                            break;
-                        case ConsoleKey.LeftArrow:
-                        case ConsoleKey.Backspace:
-                            if (this != _root)
-                                return;
-                            break;
-                        default:
-                            break;
-                    }
-                } while (true);
-            }
-        }
-
 
         public override string ToString()
         {
