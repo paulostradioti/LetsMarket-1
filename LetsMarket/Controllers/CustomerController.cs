@@ -1,5 +1,6 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
+using LetsMarket.Repositories;
 using Sharprompt;
 
 namespace LetsMarket
@@ -14,46 +15,51 @@ namespace LetsMarket
             if (!save)
                 return;
 
-            Repository.Customers.Add(employee);
-            Repository.Save(DatabaseOption.Customers);
+            var customerRepository = new CustomerRepository();
+
+            customerRepository.Add(employee);
         }
 
         public static void ListCustomers()
         {
+            var customerRepository = new CustomerRepository();
             Console.WriteLine("Listando Clientes");
             Console.WriteLine();
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(Repository.Customers);
+            table.From(customerRepository.GetAll());
             Console.WriteLine(table.ToString());
         }
 
         public static void UpdateCustomer()
         {
-            var client = Prompt.Select("Selecione o Cliente para Editar", Repository.Customers, defaultValue: Repository.Customers[0]);
+            var customerRepository = new CustomerRepository();
+            var customers = customerRepository.GetAll();
+            var customer = Prompt.Select("Selecione o Cliente para Editar", customers, defaultValue: customers[0]);
 
-            Prompt.Bind(client);
-
-            Repository.Save(DatabaseOption.Customers);
+            Prompt.Bind(customer);
+            customerRepository.Update(customer);
         }
 
         public static void RemoveCustomer()
         {
-            if (Repository.Customers.Count == 1)
+            var customerRepository = new CustomerRepository();
+            var customers = customerRepository.GetAll();
+            if (customers.Count == 1)
             {
                 ConsoleInput.WriteError("Não é possível remover todos os usuários.");
                 Console.ReadKey();
                 return;
             }
 
-            var customer = Prompt.Select("Selecione o Cliente para Remover", Repository.Customers);
+            var customer = Prompt.Select("Selecione o Cliente para Remover", customers);
             var confirm = Prompt.Confirm("Tem Certeza?", false);
 
             if (!confirm)
                 return;
 
-            Repository.Customers.Remove(customer);
-            Repository.Save(DatabaseOption.Customers);
+            customerRepository.Remove(customer);
+
         }
     }
 }

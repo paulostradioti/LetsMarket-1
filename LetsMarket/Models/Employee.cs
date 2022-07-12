@@ -2,7 +2,8 @@
 
 namespace LetsMarket.Models
 {
-    public class Employee
+    [Serializable]
+    public class Employee : Entity
     {
         [Display(Name = "Nome")]
         [Required]

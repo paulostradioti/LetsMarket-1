@@ -2,7 +2,8 @@
 
 namespace LetsMarket.Models
 {
-    public class Product
+    [Serializable]
+    public class Product : Entity
     {
         [Display(Name = "Código")]
         [Required(ErrorMessage = "O código é obrigatório")]

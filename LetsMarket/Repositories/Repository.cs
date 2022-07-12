@@ -1,129 +1,106 @@
-﻿using CsvHelper;
-using LetsMarket.Models;
-using System.Globalization;
+﻿using LetsMarket.Models;
+using LetsMarket.Repositories.Interfaces;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
-namespace LetsMarket
+namespace LetsMarket.Repositories
 {
-    public enum DatabaseOption { Employees, Products, Customers }
-
-    public class Repository
+    public abstract class Repository<T> : IRepository<T>
+        where T : Entity
     {
-        private static readonly string _rootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string _employeesDb = Path.Combine(_rootDirectory, "employees.xml");
-        private static readonly string _productsDb = Path.Combine(_rootDirectory, "products.xml");
-        private static readonly string _clientsDb = Path.Combine(_rootDirectory, "customers.xml");
 
-        public static List<Employee> Employees = new List<Employee>();
-        public static List<Product> Products = new List<Product>();
-        public static List<Customer> Customers = new List<Customer>();
+        private readonly string _fileName;
+        private List<T> _items;
+        private long _count = 0;
 
-        static Repository()
+        protected Repository()
         {
-            InitializeDatabase();
+            _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml");
+            Load();
         }
 
-        public static void InitializeDatabase()
+        private void Load()
         {
-            if (!File.Exists(_employeesDb))
+            if (File.Exists(_fileName))
             {
-                Employees.Add(new Employee { Name = "Admin", Login = "admin", Password = "admin" });
-                Save(DatabaseOption.Employees);
-            }
-
-            if (!File.Exists(_productsDb) && File.Exists("Database/data.csv"))
-            {
-                var faker = new Bogus.DataSets.Commerce();
-
-                using (var reader = new StreamReader("Database/data.csv"))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+                using (TextReader reader = new StreamReader(_fileName))
                 {
-                    csv.Context.RegisterClassMap<CsvReaderClassMap>();
-                    var products = csv.GetRecords<Product>().ToList();
-                    Products = products.OrderBy(x => Guid.NewGuid()).Take(10).ToList();
-                    products.ForEach(x => x.Price = decimal.Parse(faker.Price()));
+                    var items = serializer.Deserialize(reader) as List<T>;
+                    foreach (var item in items)
+                    {
+                        _count++;
+                        item.SetId(_count);
+                    }
 
-                    Save(DatabaseOption.Products);
+                    _items = items ?? new List<T>();
                 }
             }
-
-            if (!File.Exists(_clientsDb))
+            else
             {
-                for (int i = 0; i < 10; i++)
-                    Customers.Add(CustomerFaker.Generate());
-                
-                Save(DatabaseOption.Customers);
-            }
-
-            Load(DatabaseOption.Employees);
-            Load(DatabaseOption.Products);
-            Load(DatabaseOption.Customers);
-        }
-
-        private static void Load(DatabaseOption options)
-        {
-            if (options == DatabaseOption.Employees)
-            {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Employee>));
-                using (TextReader reader = new StreamReader(_employeesDb))
-                {
-                    var employees = employeeSerializer.Deserialize(reader) as List<Employee>;
-                    Employees = employees ?? new List<Employee>();
-                }
-            }
-
-            if (options == DatabaseOption.Products)
-            {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Product>));
-                using (TextReader reader = new StreamReader(_productsDb))
-                {
-                    var funcionarios = employeeSerializer.Deserialize(reader) as List<Product>;
-                    Products = funcionarios ?? new List<Product>();
-                }
-            }
-
-            if (options == DatabaseOption.Customers)
-            {
-                XmlSerializer clientSerializer = new XmlSerializer(typeof(List<Customer>));
-                using (TextReader reader = new StreamReader(_clientsDb))
-                {
-                    var funcionarios = clientSerializer.Deserialize(reader) as List<Customer>;
-                    Customers = funcionarios ?? new List<Customer>();
-                }
+                _items = new List<T>();
             }
         }
 
-        public static void Save(DatabaseOption options)
+        private void Save()
         {
             Console.WriteLine("Salvando...");
-
-            if (options == DatabaseOption.Employees)
+            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
+            using (TextWriter writer = new StreamWriter(_fileName))
             {
-                XmlSerializer employeeSerializer = new XmlSerializer(typeof(List<Employee>));
-                using (TextWriter writer = new StreamWriter(_employeesDb))
-                {
-                    employeeSerializer.Serialize(writer, Employees);
-                }
-            }
-
-            if (options == DatabaseOption.Products)
-            {
-                XmlSerializer productSerializer = new XmlSerializer(typeof(List<Product>));
-                using (TextWriter writer = new StreamWriter(_productsDb))
-                {
-                    productSerializer.Serialize(writer, Products);
-                }
-            }
-
-            if (options == DatabaseOption.Customers)
-            {
-                XmlSerializer clientSerializer = new XmlSerializer(typeof(List<Customer>));
-                using (TextWriter writer = new StreamWriter(_clientsDb))
-                {
-                    clientSerializer.Serialize(writer, Customers);
-                }
+                serializer.Serialize(writer, _items);
             }
             Console.WriteLine("Salvo.");
+        }
+
+        public T DeepClone(T obj)
+        {
+            T objResult;
+
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, obj);
+
+                ms.Position = 0;
+                objResult = (T)bf.Deserialize(ms);
+            }
+            return objResult;
+        }
+
+        public void Add(T model)
+        {
+            _count++;
+            model.SetId(_count);
+            _items.Add(model);
+            Save();
+        }
+
+        public void Remove(T model)
+        {
+            var item = _items.Find(i => i.GetId() == model.GetId());
+            _items.Remove(item);
+            Save();
+        }
+
+        public List<T> GetAll()
+        {
+            var ret = new List<T>();
+            foreach (var item in _items)
+            {
+                ret.Add(DeepClone(item));
+            }
+            return ret;
+        }
+
+        public void Update(T model)
+        {
+            var item = _items.FirstOrDefault(i => i.GetId() == model.GetId());
+            var itemIndex = _items.IndexOf(item);
+            _items.RemoveAt(itemIndex);
+            _items.Insert(itemIndex, model);
+
+            Save();
         }
     }
 }

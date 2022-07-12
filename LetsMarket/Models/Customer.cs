@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace LetsMarket.Models
 {
-    public class Customer
+    [Serializable]
+    public class Customer : Entity
     {
         [Display(Name = "Nome")]
         [Required]

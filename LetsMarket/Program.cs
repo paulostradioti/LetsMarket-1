@@ -1,4 +1,5 @@
-﻿using Sharprompt;
+﻿using LetsMarket.Repositories;
+using Sharprompt;
 
 namespace LetsMarket
 {
@@ -6,6 +7,16 @@ namespace LetsMarket
     {     
         static void Main()
         {
+            //var employeeRepository = new EmployeeRepository();
+
+            //var list = employeeRepository.GetAll();
+
+            //var excluir = list.Find(l => l.Login == "ana");
+            //list[0].Login = "teste";
+            //employeeRepository.Remove(excluir);
+
+
+            DatabaseInitializer.Initialize();
             ConfigurePrompt();
             Console.Title = "Let's Store";
 
@@ -84,7 +95,8 @@ namespace LetsMarket
 
         private static bool IsLoginValid(string? username, string password)
         {
-            foreach (var user in Repository.Employees)
+            var employeesRepository = new EmployeeRepository();
+            foreach (var user in employeesRepository.GetAll())
             {
                 if (user.Login == username && user.Password == password)
                     return true;
