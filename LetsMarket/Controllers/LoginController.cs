@@ -7,14 +7,21 @@ namespace LetsMarket.Controllers
 {
     public class LoginController : ILoginController
     {
+        ILoginView _loginView;
+
+        public LoginController(ILoginView loginView)
+        {
+            _loginView = loginView;
+        }
+
         private static readonly string ATTEMPTS_ERROR = "Muitas tentativas";
-        public Employee Login(ILoginView loginView)
+        public Employee Login()
         {
             for (int i = 0; i < 3; i++)
             {
                 Console.Clear();
-                var login = loginView.GetLogin();
-                var password = loginView.GetPassword();
+                var login = _loginView.GetLogin();
+                var password = _loginView.GetPassword();
 
                 try
                 {
@@ -23,11 +30,11 @@ namespace LetsMarket.Controllers
                 }
                 catch (Exception ex)
                 {
-                    loginView.ShowError(ex.Message);
+                    _loginView.ShowError(ex.Message);
                 }
             }
 
-            loginView.ShowError(ATTEMPTS_ERROR);
+            _loginView.ShowError(ATTEMPTS_ERROR);
 
             Environment.Exit(0);
             return new Employee();

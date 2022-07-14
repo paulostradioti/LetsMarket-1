@@ -1,4 +1,5 @@
 ﻿using LetsMarket.Controllers;
+using LetsMarket.Controllers.ControllersHandlers;
 using LetsMarket.Controllers.ControllersInterface;
 using LetsMarket.Views;
 using LetsMarket.Views.ViewInterface;
@@ -15,19 +16,17 @@ namespace LetsMarket
                 .AddScoped<ILoginController, LoginController>()
                 .AddScoped<ILoginView, LoginView>()
                 .AddScoped<IMenuController, MenuController>()
-                .AddScoped<IMenuView, MenuView>();
+                .AddScoped<IMenuView, MenuView>()
+                .AddScoped<IKeyHandlerFactory, KeyHandlerFactory>();
             var serviceProvider = serviceCollection.BuildServiceProvider();
-
-            var loginView = serviceProvider.GetService<ILoginView>();
             var loginController = serviceProvider.GetService<ILoginController>();
             var menuController = serviceProvider.GetService<IMenuController>();
-            var menuView = serviceProvider.GetService<IMenuView>();
 
             ConfigurePrompt();
-            var employee = loginController.Login(loginView);
+            var employee = loginController.Login();
 
             var mainMenu = menuController.CreateMenu();
-            menuController.RunMenu(mainMenu, menuView);
+            menuController.RunMenu(mainMenu);
         }
     }
 }
