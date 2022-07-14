@@ -9,7 +9,7 @@ namespace LetsMarket
     {
 
 
-        public static void RegisterProduct()
+        public static void AddProduct()
         {
             var productRepository = new ProductRepository();
             

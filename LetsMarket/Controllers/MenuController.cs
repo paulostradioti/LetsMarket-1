@@ -36,19 +36,19 @@ namespace LetsMarket.Controllers
             var menu = new Menu("Menu Principal");
 
             var products = new Menu("Produtos");
-            products.Add(new Menu("Cadastrar Produtos", ProductController.RegisterProduct));
+            products.Add(new Menu("Cadastrar Produtos", ProductController.AddProduct));
             products.Add(new Menu("Listar Produtos", ProductController.ListProducts));
             products.Add(new Menu("Editar Produtos", ProductController.UpdateProduct));
             products.Add(new Menu("Remover Produtos", ProductController.RemoveProduct));
 
             var employees = new Menu("Funcionários");
-            employees.Add(new Menu("Cadastrar Funcionários", _employeeController.RegisterEmployee));
+            employees.Add(new Menu("Cadastrar Funcionários", _employeeController.AddEmployee));
             employees.Add(new Menu("Listar Funcionários", _employeeController.ListEmployees));
             employees.Add(new Menu("Editar Funcionários", _employeeController.UpdateEmployee));
             employees.Add(new Menu("Remover Funcionários", _employeeController.RemoveEmployee));
 
             var customers = new Menu("Clientes");
-            customers.Add(new Menu("Cadastrar Clientes", CustomerController.RegisterCustomer));
+            customers.Add(new Menu("Cadastrar Clientes", CustomerController.AddCustomer));
             customers.Add(new Menu("Listar Clientes", CustomerController.ListCustomers));
             customers.Add(new Menu("Editar Clientes", CustomerController.UpdateCustomer));
             customers.Add(new Menu("Remover Clientes", CustomerController.RemoveCustomer));

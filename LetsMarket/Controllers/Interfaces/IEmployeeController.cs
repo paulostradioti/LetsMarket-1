@@ -8,7 +8,7 @@ namespace LetsMarket.Controllers.Interfaces
 {
     public interface IEmployeeController
     {
-        void RegisterEmployee();
+        void AddEmployee();
 
         void ListEmployees();
 

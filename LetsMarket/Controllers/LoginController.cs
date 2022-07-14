@@ -1,20 +1,23 @@
 ﻿using LetsMarket.Controllers.ControllersInterface;
 using LetsMarket.Models;
+using LetsMarket.Repositories.Interfaces;
 using LetsMarket.Views.ViewInterface;
-using Sharprompt;
 
 namespace LetsMarket.Controllers
 {
     public class LoginController : ILoginController
     {
         ILoginView _loginView;
+        IEmployeeRepository _employeeRepository;
 
-        public LoginController(ILoginView loginView)
+        public LoginController(ILoginView loginView, IEmployeeRepository employeeRepository)
         {
             _loginView = loginView;
+            _employeeRepository = employeeRepository;
         }
 
         private static readonly string ATTEMPTS_ERROR = "Muitas tentativas";
+
         public Employee Login()
         {
             for (int i = 0; i < 3; i++)
@@ -42,13 +45,9 @@ namespace LetsMarket.Controllers
 
         public Employee ValidateLogin(string login, string password)
         {
-            var employee = new Employee()
-            {
-                Login = login,
-            };
+            var employee = _employeeRepository.GetByCredentials(login, password);
 
-            if (employee == null) throw new Exception("Usuário não encontrado");
-            if (!employee.ValidatePassword(password)) throw new Exception("Senha incorreta");
+            if (employee == null) throw new Exception("Credenciais inválidas!");
 
             return employee;
         }

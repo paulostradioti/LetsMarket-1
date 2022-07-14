@@ -17,7 +17,7 @@ namespace LetsMarket
             _repository = repository;
         }
 
-        public void RegisterEmployee()
+        public void AddEmployee()
         {
             var employee = _view.GetEmployee();
             

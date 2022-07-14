@@ -7,7 +7,7 @@ namespace LetsMarket
 {
     public class CustomerController
     {
-        public static void RegisterCustomer()
+        public static void AddCustomer()
         {
             var employee = Prompt.Bind<Customer>();
 
