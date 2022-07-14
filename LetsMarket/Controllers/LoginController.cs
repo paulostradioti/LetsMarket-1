@@ -42,7 +42,10 @@ namespace LetsMarket.Controllers
 
         public Employee ValidateLogin(string login, string password)
         {
-            var employee = new Employee("nome", "login", "senha", EmployeeCategory.Manager); //FIXME
+            var employee = new Employee()
+            {
+                Login = login,
+            };
 
             if (employee == null) throw new Exception("Usuário não encontrado");
             if (!employee.ValidatePassword(password)) throw new Exception("Senha incorreta");

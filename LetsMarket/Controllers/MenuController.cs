@@ -1,5 +1,6 @@
 ﻿using LetsMarket.Controllers.ControllersHandlers;
 using LetsMarket.Controllers.ControllersInterface;
+using LetsMarket.Controllers.Interfaces;
 using LetsMarket.Models;
 using LetsMarket.Views.ViewInterface;
 
@@ -9,11 +10,13 @@ namespace LetsMarket.Controllers
     {
         private IMenuView _menuView;
         private IKeyHandlerFactory _keyHandlerFactory;
+        private IEmployeeController _employeeController;
 
-        public MenuController(IMenuView menuView, IKeyHandlerFactory keyHandlerFactory)
+        public MenuController(IMenuView menuView, IKeyHandlerFactory keyHandlerFactory, IEmployeeController employeeController)
         {
             _menuView = menuView;
             _keyHandlerFactory = keyHandlerFactory;
+            _employeeController = employeeController;
         }
         public static List<ConsoleKey> acceptedKeys = new List<ConsoleKey>() 
         { 
@@ -27,6 +30,7 @@ namespace LetsMarket.Controllers
             ConsoleKey.LeftArrow,
             ConsoleKey.Backspace
         };
+
         public Menu CreateMenu()
         {
             var menu = new Menu("Menu Principal");
@@ -38,10 +42,10 @@ namespace LetsMarket.Controllers
             products.Add(new Menu("Remover Produtos", ProductController.RemoveProduct));
 
             var employees = new Menu("Funcionários");
-            employees.Add(new Menu("Cadastrar Funcionários", EmployeeController.RegisterEmployee));
-            employees.Add(new Menu("Listar Funcionários", EmployeeController.ListEmployees));
-            employees.Add(new Menu("Editar Funcionários", EmployeeController.UpdateEmployee));
-            employees.Add(new Menu("Remover Funcionários", EmployeeController.RemoveEmployee));
+            employees.Add(new Menu("Cadastrar Funcionários", _employeeController.RegisterEmployee));
+            employees.Add(new Menu("Listar Funcionários", _employeeController.ListEmployees));
+            employees.Add(new Menu("Editar Funcionários", _employeeController.UpdateEmployee));
+            employees.Add(new Menu("Remover Funcionários", _employeeController.RemoveEmployee));
 
             var customers = new Menu("Clientes");
             customers.Add(new Menu("Cadastrar Clientes", CustomerController.RegisterCustomer));

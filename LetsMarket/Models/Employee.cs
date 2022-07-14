@@ -5,23 +5,6 @@ namespace LetsMarket.Models
     [Serializable]
     public class Employee : Entity
     {
-        private string v1;
-        private string v2;
-        private string v3;
-        private EmployeeCategory manager;
-
-        public Employee()
-        {
-        }
-
-        public Employee(string v1, string v2, string v3, EmployeeCategory manager)
-        {
-            this.v1 = v1;
-            this.v2 = v2;
-            this.v3 = v3;
-            this.manager = manager;
-        }
-
         [Display(Name = "Nome")]
         [Required]
         public string Name { get; set; }

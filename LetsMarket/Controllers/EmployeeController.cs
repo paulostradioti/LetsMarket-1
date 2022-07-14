@@ -1,75 +1,68 @@
 ﻿using BetterConsoleTables;
-using LetsMarket.Models;
-using LetsMarket.Repositories;
 using Sharprompt;
+using LetsMarket.Repositories.Interfaces;
+using LetsMarket.Views.Interfaces;
+using LetsMarket.Controllers.Interfaces;
 
 namespace LetsMarket
 {
-    public class EmployeeController
+    public class EmployeeController : IEmployeeController
     {
-        public static void RegisterEmployee()
+        IEmployeeView _view;
+        IEmployeeRepository _repository;
+
+        public EmployeeController(IEmployeeView view, IEmployeeRepository repository)
         {
-            var employeeRepository = new Repositories.EmployeeRepository();
-            var employee = new Employee();
-            employee = Prompt.Bind<Employee>();
-            var save = Prompt.Confirm("Deseja Salvar?");
-            if (!save)
+            _view = view;
+            _repository = repository;
+        }
+
+        public void RegisterEmployee()
+        {
+            var employee = _view.GetEmployee();
+            
+            if (!_view.Confirm("Deseja salvar?"))
                 return;
 
-            employeeRepository.Add(employee);
+            _repository.Add(employee);
         }
 
-        private static string CreateLoginSuggestionBasedOnName(string name)
+        public void ListEmployees()
         {
-            var parts = name?.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var suggestion = parts?.Length > 0 ? (parts.Length > 1 ? $"{parts[0]}.{parts[parts.Length - 1]}" : $"{parts[0]}") : "";
-
-            return suggestion.ToLower();
-        }
-
-        public static void ListEmployees()
-        {
-            var employeeRepository = new EmployeeRepository();
-            Console.WriteLine("Listando Funcionários");
-            Console.WriteLine();
+            _view.WriteMessage("Listando Funcionários\n");
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(employeeRepository.GetAll());
+            table.From(_repository.GetAll());
             Console.WriteLine(table.ToString());
         }
 
-        public static void UpdateEmployee()
+        public void UpdateEmployee()
         {
-            var employeeRepository = new EmployeeRepository();
-            var employees = employeeRepository.GetAll();
+            var employees = _repository.GetAll();
 
-            var employee = Prompt.Select("Selecione o Funcionário para Editar", employees, defaultValue: employees[0]);
+            var employee = _view.Select("Selecione o Funcionário para Editar", employees);
 
-            Prompt.Bind(employee);
+            _view.GetEmployee(employee);
 
-            employeeRepository.Update(employee);
+            _repository.Update(employee);
         }
 
-        public static void RemoveEmployee()
+        public void RemoveEmployee()
         {
-            var employeeRepository = new EmployeeRepository();
-
-            var employees = employeeRepository.GetAll();
+            var employees = _repository.GetAll();
 
             if (employees.Count == 1)
             {
-                ConsoleInput.WriteError("Não é possível remover todos os usuários.");
-                Console.ReadKey();
+                _view.ShowError("Não é possível remover todos os usuários.");
                 return;
             }
 
-            var employee = Prompt.Select("Selecione o Funcionário para Remover", employees);
-            var confirm = Prompt.Confirm("Tem Certeza?", false);
+            var employee = _view.Select("Selecione o Funcionário para Remover", employees);
 
-            if (!confirm)
+            if (!_view.Confirm("Tem Certeza?", false))
                 return;
 
-            employeeRepository.Remove(employee);
+            _repository.Remove(employee);
         }
     }
 }
