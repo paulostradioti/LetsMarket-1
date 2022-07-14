@@ -10,7 +10,7 @@ namespace LetsMarket.Controllers.ControllersInterface
 {
     public interface ILoginController
     {
-        public Employee Login(ILoginView loginView);
+        public Employee Login();
         public Employee ValidateLogin(string login, string password);
     }
 }
