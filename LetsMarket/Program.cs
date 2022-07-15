@@ -13,7 +13,7 @@ using static LetsMarket.Utils;
 namespace LetsMarket
 {
     public class Program
-    {     
+    {
         static void Main()
         {
             var serviceCollection = new ServiceCollection()
@@ -24,7 +24,8 @@ namespace LetsMarket
                 .AddScoped<IMenuController, MenuController>()
                 .AddScoped<IEmployeeController, EmployeeController>()
                 .AddScoped<IEmployeeRepository, EmployeeRepository>()
-                .AddScoped<IKeyHandlerFactory, KeyHandlerFactory>();
+                .AddScoped<IKeyHandlerFactory, KeyHandlerFactory>()
+                .AddRepository();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var loginController = serviceProvider.GetService<ILoginController>();
