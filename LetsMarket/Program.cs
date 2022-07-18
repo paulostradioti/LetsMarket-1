@@ -20,10 +20,13 @@ namespace LetsMarket
                 .AddScoped<IMenuView, MenuView>()
                 .AddScoped<ILoginView, LoginView>()
                 .AddScoped<IEmployeeView, EmployeeView>()
+                .AddScoped<IProductView, ProductView>()
                 .AddScoped<ILoginController, LoginController>()
                 .AddScoped<IMenuController, MenuController>()
                 .AddScoped<IEmployeeController, EmployeeController>()
+                .AddScoped<IProductController, ProductController>()
                 .AddScoped<IEmployeeRepository, EmployeeRepository>()
+                .AddScoped<IProductRepository, ProductRepository>()
                 .AddScoped<IKeyHandlerFactory, KeyHandlerFactory>()
                 .AddRepository();
 

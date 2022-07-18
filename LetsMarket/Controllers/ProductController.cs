@@ -1,58 +1,61 @@
 ﻿using BetterConsoleTables;
+using LetsMarket.Controllers.Interfaces;
 using LetsMarket.Models;
 using LetsMarket.Repositories;
+using LetsMarket.Repositories.Interfaces;
+using LetsMarket.Views.Interfaces;
 using Sharprompt;
 
 namespace LetsMarket
 {
-    public class ProductController
+    public class ProductController : IProductController
     {
+        IProductView _view;
+        IProductRepository _repository;
 
-
-        public static void AddProduct()
+        public ProductController(IProductView view, IProductRepository repository)
         {
-            var productRepository = new ProductRepository();
-            
-            var product = Prompt.Bind<Product>();
-
-            if (!Prompt.Confirm("Deseja Salvar?"))
-                return;
-
-            productRepository.Add(product);
+            _view = view;
+            _repository = repository;
         }
 
-        public static void ListProducts()
+        public void AddProduct()
         {
-            var productRepository = new ProductRepository();
-            
-            Console.WriteLine("Listando Produtos");
-            Console.WriteLine();
+            var product = _view.GetProduct();
+
+            if (!_view.Confirm("Deseja salvar?"))
+                return;
+
+            _repository.Add(product);
+        }
+
+        public void ListProducts()
+        {
+            _view.WriteMessage("Listando Produtos\n");
 
             var table = new Table(TableConfiguration.UnicodeAlt());
-            table.From(productRepository.GetAll());
+            table.From(_repository.GetAll());
             Console.WriteLine(table.ToString());
         }
 
-        public static void UpdateProduct()
+        public void UpdateProduct()
         {
-            var productRepository =new ProductRepository();
-            var products = productRepository.GetAll();
-            var product = Prompt.Select("Selecione o Produto para Editar", products, defaultValue: products[0]);
+            var products = _repository.GetAll();
+            var product = _view.Select("Selecione o Produto para Editar", products);
 
-            Prompt.Bind(product);
-            productRepository.Update(product);
+            _view.GetProduct(product);
+            _repository.Update(product);
         }
 
-        public static void RemoveProduct()
+        public void RemoveProduct()
         {
-            var productRepository = new ProductRepository();
-            var product = Prompt.Select("Selecione o Produto para Remover", productRepository.GetAll());
-            var confirm = Prompt.Confirm("Tem Certeza?", false);
+            var products = _repository.GetAll();
+            var product = _view.Select("Selecione o Produto para Remover", products);
 
-            if (!confirm)
+            if (!_view.Confirm("Tem Certeza?", false))
                 return;
 
-            productRepository.Remove(product);
+            _repository.Remove(product);
         }
     }
 }

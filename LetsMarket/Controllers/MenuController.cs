@@ -11,13 +11,16 @@ namespace LetsMarket.Controllers
         private IMenuView _menuView;
         private IKeyHandlerFactory _keyHandlerFactory;
         private IEmployeeController _employeeController;
+        private IProductController _productController;
 
-        public MenuController(IMenuView menuView, IKeyHandlerFactory keyHandlerFactory, IEmployeeController employeeController)
+        public MenuController(IMenuView menuView, IKeyHandlerFactory keyHandlerFactory, IEmployeeController employeeController, IProductController productController)
         {
             _menuView = menuView;
             _keyHandlerFactory = keyHandlerFactory;
             _employeeController = employeeController;
+            _productController = productController;
         }
+
         public static List<ConsoleKey> acceptedKeys = new List<ConsoleKey>() 
         { 
             ConsoleKey.PageUp,
@@ -36,10 +39,10 @@ namespace LetsMarket.Controllers
             var menu = new Menu("Menu Principal");
 
             var products = new Menu("Produtos");
-            products.Add(new Menu("Cadastrar Produtos", ProductController.AddProduct));
-            products.Add(new Menu("Listar Produtos", ProductController.ListProducts));
-            products.Add(new Menu("Editar Produtos", ProductController.UpdateProduct));
-            products.Add(new Menu("Remover Produtos", ProductController.RemoveProduct));
+            products.Add(new Menu("Cadastrar Produtos", _productController.AddProduct));
+            products.Add(new Menu("Listar Produtos", _productController.ListProducts));
+            products.Add(new Menu("Editar Produtos", _productController.UpdateProduct));
+            products.Add(new Menu("Remover Produtos", _productController.RemoveProduct));
 
             var employees = new Menu("Funcionários");
             employees.Add(new Menu("Cadastrar Funcionários", _employeeController.AddEmployee));
