@@ -1,6 +1,5 @@
 ﻿using LetsMarket.Models;
 using LetsMarket.Repositories.Interfaces;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
 namespace LetsMarket.Repositories
@@ -12,12 +11,15 @@ namespace LetsMarket.Repositories
         private readonly string _fileName;
         private List<T> _items;
         private long _count = 0;
+        public int Count { get => _items.Count; }
 
         protected Repository()
         {
             _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml");
+            InitializeData();
             Load();
         }
+        protected abstract void InitializeData();
 
         private void Load()
         {
@@ -79,5 +81,9 @@ namespace LetsMarket.Repositories
 
             Save();
         }
+
+        protected T Get(Func<T, bool> expression)
+            => _items.AsReadOnly().FirstOrDefault(expression);
+
     }
 }
