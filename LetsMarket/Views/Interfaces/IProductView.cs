@@ -9,7 +9,7 @@ namespace LetsMarket.Views.Interfaces
 {
     public interface IProductView
     {
-        Product GetProduct(Product? product = null);
+        Product Bind(Product? product = null);
 
         bool Confirm(string msg, bool defaultValue = false);
 

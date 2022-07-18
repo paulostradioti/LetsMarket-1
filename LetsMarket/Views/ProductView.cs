@@ -11,7 +11,7 @@ namespace LetsMarket.Views
 {
     internal class ProductView : IProductView
     {
-        public Product GetProduct(Product Product = null)
+        public Product Bind(Product Product = null)
         {
             return Product == null ?
                     Prompt.Bind<Product>() :

@@ -21,7 +21,7 @@ namespace LetsMarket
 
         public void AddProduct()
         {
-            var product = _view.GetProduct();
+            var product = _view.Bind();
 
             if (!_view.Confirm("Deseja salvar?"))
                 return;
@@ -43,7 +43,7 @@ namespace LetsMarket
             var products = _repository.GetAll();
             var product = _view.Select("Selecione o Produto para Editar", products);
 
-            _view.GetProduct(product);
+            _view.Bind(product);
             _repository.Update(product);
         }
 
