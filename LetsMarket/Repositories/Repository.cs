@@ -53,21 +53,6 @@ namespace LetsMarket.Repositories
             Console.WriteLine("Salvo.");
         }
 
-        public T DeepClone(T obj)
-        {
-            T objResult;
-
-            using (var ms = new MemoryStream())
-            {
-                var bf = new BinaryFormatter();
-                bf.Serialize(ms, obj);
-
-                ms.Position = 0;
-                objResult = (T)bf.Deserialize(ms);
-            }
-            return objResult;
-        }
-
         public void Add(T model)
         {
             _count++;
@@ -83,15 +68,7 @@ namespace LetsMarket.Repositories
             Save();
         }
 
-        public List<T> GetAll()
-        {
-            var ret = new List<T>();
-            foreach (var item in _items)
-            {
-                ret.Add(DeepClone(item));
-            }
-            return ret;
-        }
+        public List<T> GetAll() => _items.AsReadOnly().ToList();
 
         public void Update(T model)
         {

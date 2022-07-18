@@ -9,7 +9,7 @@ namespace LetsMarket.Views.Interfaces
 {
     public interface IEmployeeView
     {
-        Employee GetEmployee(Employee? employee = null);
+        Employee Bind(Employee? employee = null);
 
         bool Confirm(string msg, bool defaultValue = false);
 
