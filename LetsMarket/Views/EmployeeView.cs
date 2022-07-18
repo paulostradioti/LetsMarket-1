@@ -7,7 +7,7 @@ namespace LetsMarket.Views
     public class EmployeeView : IEmployeeView
     {
 
-        public Employee GetEmployee(Employee employee = null)
+        public Employee Bind(Employee? employee = null)
         {
             return employee == null ? 
                     Prompt.Bind<Employee>() : 

@@ -19,7 +19,7 @@ namespace LetsMarket
 
         public void AddEmployee()
         {
-            var employee = _view.GetEmployee();
+            var employee = _view.Bind();
             
             if (!_view.Confirm("Deseja salvar?"))
                 return;
@@ -41,8 +41,7 @@ namespace LetsMarket
             var employees = _repository.GetAll();
 
             var employee = _view.Select("Selecione o Funcionário para Editar", employees);
-
-            _view.GetEmployee(employee);
+            employee = _view.Bind(employee);
 
             _repository.Update(employee);
         }
