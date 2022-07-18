@@ -85,6 +85,7 @@ namespace LetsMarket.Controllers
             else if (menu.Type == MenuType.Command)
             {
                 menu.action();
+                Console.ReadLine();
                 RunMenu(menu.parent);
             }
         }

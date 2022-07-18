@@ -16,12 +16,12 @@ namespace LetsMarket.Repositories
         protected Repository()
         {
             _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml");
+            LoadFile();
             InitializeData();
-            Load();
         }
         protected abstract void InitializeData();
 
-        private void Load()
+        private void LoadFile()
         {
             if (File.Exists(_fileName))
             {

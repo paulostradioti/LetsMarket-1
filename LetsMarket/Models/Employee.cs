@@ -20,5 +20,10 @@ namespace LetsMarket.Models
 
         [Display(Name = "Categoria")]
         public EmployeeCategory Category { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
