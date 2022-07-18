@@ -5,7 +5,7 @@ namespace LetsMarket.Controllers.ControllersHandlers
 {
     public class KeyHandlerFactory : IKeyHandlerFactory
     {
-        public Dictionary<ConsoleKey, IKeyHandler> keys = new Dictionary<ConsoleKey, IKeyHandler>();
+        public static Dictionary<ConsoleKey, IKeyHandler> keys = new Dictionary<ConsoleKey, IKeyHandler>();
 
         public KeyHandlerFactory()
         {

@@ -1,6 +1,5 @@
 ﻿using LetsMarket.Models;
 using LetsMarket.Repositories.Interfaces;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 
 namespace LetsMarket.Repositories
@@ -12,12 +11,15 @@ namespace LetsMarket.Repositories
         private readonly string _fileName;
         private List<T> _items;
         private long _count = 0;
+        public int Count { get => _items.Count; }
 
         protected Repository()
         {
             _fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{typeof(T).Name.ToLower()}s.xml");
+            InitializeData();
             Load();
         }
+        protected abstract void InitializeData();
 
         private void Load()
         {
@@ -53,21 +55,6 @@ namespace LetsMarket.Repositories
             Console.WriteLine("Salvo.");
         }
 
-        public T DeepClone(T obj)
-        {
-            T objResult;
-
-            using (var ms = new MemoryStream())
-            {
-                var bf = new BinaryFormatter();
-                bf.Serialize(ms, obj);
-
-                ms.Position = 0;
-                objResult = (T)bf.Deserialize(ms);
-            }
-            return objResult;
-        }
-
         public void Add(T model)
         {
             _count++;
@@ -83,15 +70,7 @@ namespace LetsMarket.Repositories
             Save();
         }
 
-        public List<T> GetAll()
-        {
-            var ret = new List<T>();
-            foreach (var item in _items)
-            {
-                ret.Add(DeepClone(item));
-            }
-            return ret;
-        }
+        public List<T> GetAll() => _items.AsReadOnly().ToList();
 
         public void Update(T model)
         {
@@ -102,5 +81,9 @@ namespace LetsMarket.Repositories
 
             Save();
         }
+
+        protected T Get(Func<T, bool> expression)
+            => _items.AsReadOnly().FirstOrDefault(expression);
+
     }
 }
