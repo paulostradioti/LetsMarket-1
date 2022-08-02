@@ -42,9 +42,10 @@ namespace LetsMarket
         {
             var products = _repository.GetAll();
             var product = _view.Select("Selecione o Produto para Editar", products);
+            var currentId = product.Id;
 
             _view.Bind(product);
-            _repository.Update(product);
+            _repository.Update(product, currentId);
         }
 
         public void RemoveProduct()

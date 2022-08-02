@@ -12,13 +12,19 @@ namespace LetsMarket.Controllers
         private IKeyHandlerFactory _keyHandlerFactory;
         private IEmployeeController _employeeController;
         private IProductController _productController;
+        private readonly CartController _cartController;
 
-        public MenuController(IMenuView menuView, IKeyHandlerFactory keyHandlerFactory, IEmployeeController employeeController, IProductController productController)
+        public MenuController(IMenuView menuView, 
+            IKeyHandlerFactory keyHandlerFactory, 
+            IEmployeeController employeeController, 
+            IProductController productController,
+            CartController cartController)
         {
             _menuView = menuView;
             _keyHandlerFactory = keyHandlerFactory;
             _employeeController = employeeController;
             _productController = productController;
+            _cartController = cartController;
         }
 
         public static List<ConsoleKey> acceptedKeys = new List<ConsoleKey>() 
@@ -57,7 +63,7 @@ namespace LetsMarket.Controllers
             customers.Add(new Menu("Remover Clientes", CustomerController.RemoveCustomer));
 
             var vendas = new Menu("Vendas");
-            vendas.Add(new Menu("Efetuar Venda", CartController.Sell));
+            vendas.Add(new Menu("Efetuar Venda", _cartController.Sell));
 
             menu.Add(products);
             menu.Add(employees);

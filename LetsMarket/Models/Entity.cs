@@ -1,18 +1,20 @@
-﻿namespace LetsMarket.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LetsMarket.Models
 {
     [Serializable]
     public abstract class Entity
     {
-        private long _id;
+        protected long Id { get; set; }
 
         public void SetId(long id)
         {
-            _id = id;
+            Id = id;
         }
 
         public long GetId()
         {
-            return _id;
+            return Id;
         }
     }
 }

@@ -2,7 +2,12 @@
 
 namespace LetsMarket.Repositories.Interfaces
 {
-    public interface IProductRepository: IRepository<Product>
+    public interface IProductRepository
     {
+        void Add(Product model);
+        void Update(Product model, long currrentId);
+        void Remove(Product model);
+        List<Product> GetAll();
+        int Count { get; }
     }
 }

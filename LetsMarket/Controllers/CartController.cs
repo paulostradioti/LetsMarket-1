@@ -1,16 +1,22 @@
 ﻿using BetterConsoleTables;
 using LetsMarket.Models;
 using LetsMarket.Repositories;
+using LetsMarket.Repositories.Interfaces;
 using Sharprompt;
 
 namespace LetsMarket
 {
     public class CartController
     {
-
-        public static void Sell()
+        private IProductRepository productRepository;
+        public CartController(IProductRepository productRepository)
         {
-            var productRepository = new ProductRepository();
+            this.productRepository = productRepository;
+        }
+
+        public void Sell()
+        {
+            
             var products = productRepository.GetAll();
 
             var total = decimal.Zero;

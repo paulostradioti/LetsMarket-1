@@ -3,7 +3,7 @@
 namespace LetsMarket.Models
 {
     [Serializable]
-    public class Product : Entity
+    public class Product // : Entity
     {
         [Display(Name = "Código")]
         [Required(ErrorMessage = "O código é obrigatório")]
@@ -16,6 +16,10 @@ namespace LetsMarket.Models
         [Display(Name = "Preço")]
         [Required(ErrorMessage = "O preço é obrigatório")]
         public decimal Price { get; set; }
+
+        [Display(Name = "Id")]
+        //[Required(ErrorMessage = "O id é obrigatório")]
+        public long Id { get; set; } = 0;
 
         public override string ToString()
         {
